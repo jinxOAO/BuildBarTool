@@ -1,0 +1,7 @@
+D:\SteamLibrary\steamapps\common\Dyson Sphere Program\BepInEx\plugins\BuildMenuTool.dll
+D:\SteamLibrary\steamapps\common\Dyson Sphere Program\BepInEx\plugins\BuildMenuTool.pdb
+G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.csproj.AssemblyReference.cache
+G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.csproj.CoreCompileInputs.cache
+G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.dll
+G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.pdb
+G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.csproj.CopyComplete
