@@ -74,6 +74,7 @@ namespace BuildMenuTool
 
         public void Awake()
         {
+            BMTProtos.AddLocalizationProtos();
             logger = base.Logger;
             InitStaticData();
             Harmony.CreateAndPatchAll(typeof(BuildMenuTool));
@@ -106,12 +107,6 @@ namespace BuildMenuTool
                 {
                     protoIds[i, j] = 0;
                 }
-            }
-            lockedText = "Locked".Translate();
-            if (lockedText.Length < 10)
-            {
-                int len = (10 - lockedText.Length) / 2;
-                lockedText += new string(' ', len);
             }
         }
 
@@ -227,7 +222,7 @@ namespace BuildMenuTool
                     }
                 }
             }
-
+            lockedText = "gmLockedItemText".Translate();
         }
 
 
@@ -594,6 +589,7 @@ namespace BuildMenuTool
                         {
                             childIcons[num2].enabled = true;
                             childIcons[num2].color = normalColor;
+                            childButtons[num2].OnEnable(); // 执行以将UIButton.updating设置为true来防止颜色不一致问题
                             childButtons[num2].tips.itemId = id2;
                             childButtons[num2].tips.itemInc = 0;
                             childButtons[num2].tips.itemCount = 0;
@@ -678,6 +674,24 @@ namespace BuildMenuTool
                 childHotkeyText[i].text = flag1 ? $"F{i}" : "";
             }
 
+        }
+
+        public static void RefreshCategoryIfExtended(int category)
+        {
+            if(category <0 || category > extendedCategories.Length)
+            {
+                return;
+            }
+            extendedCategories[category] = false;
+
+            for (int i = 0; i < 13; i++)
+            {
+                if (protos[category, i] != null)
+                {
+                    extendedCategories[category] = true;
+                    return;
+                }
+            }
         }
 
     }

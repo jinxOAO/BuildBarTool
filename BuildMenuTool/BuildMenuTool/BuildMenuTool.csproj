@@ -90,6 +90,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BMTProtos.cs" />
     <Compile Include="BuildBar.cs" />
     <Compile Include="BuildMenuTool.cs" />
     <Compile Include="Compatibility\RebindBuildBarCompat.cs" />

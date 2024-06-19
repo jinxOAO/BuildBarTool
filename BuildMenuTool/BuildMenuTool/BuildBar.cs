@@ -59,19 +59,15 @@ namespace BuildMenuTool
             return true;
         }
 
-        public static void BindTier1(int category, int index, int itemId)
-        {
-            Bind(category, index, itemId, 1);
-        }
-
-        public static void BindTier2(int category, int index, int itemId)
-        {
-            Bind(category, index, itemId, 2);
-        }
-
         public static void BindBuildBar(this ItemProto proto, int buildIndex, int tier)
         {
             Bind(buildIndex / 100, buildIndex % 100, proto.ID ,tier);
+            proto.BuildIndex = 0;
+        }
+
+        public static void BindBuildBar(this ItemProto proto, int category, int index, int tier)
+        {
+            Bind(category, index, proto.ID, tier);
             proto.BuildIndex = 0;
         }
 

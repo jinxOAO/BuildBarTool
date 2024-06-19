@@ -71,10 +71,10 @@ namespace BuildMenuTool
                     BuildMenuTool.protos[buildMenu.currentCategory, i] = null;
                     buildMenu.SetCurrentCategory(buildMenu.currentCategory);
                     VFAudio.Create("ui-click-0", null, Vector3.zero, true);
+                    BuildMenuTool.RefreshCategoryIfExtended(buildMenu.currentCategory);
                     return;
                 }
             }
-
         }
 
 
@@ -247,6 +247,7 @@ namespace BuildMenuTool
                                     $"Item: {proto.Name.Translate()}");
                                 result.Value = proto.ID;
                                 BuildMenuTool.protos[buildMenu.currentCategory, j] = proto;
+                                BuildMenuTool.extendedCategories[buildMenu.currentCategory] = true;
                                 buildMenu.SetCurrentCategory(buildMenu.currentCategory);
                                 VFAudio.Create("ui-click-0", null, Vector3.zero, true);
                             }
@@ -285,6 +286,7 @@ namespace BuildMenuTool
                             $"Item: {proto.Name.Translate()}");
                         result.Value = proto.ID;
                         BuildMenuTool.protos[buildMenu.currentCategory, index] = proto;
+                        BuildMenuTool.extendedCategories[buildMenu.currentCategory] = true;
                         buildMenu.SetCurrentCategory(buildMenu.currentCategory);
                         VFAudio.Create("ui-click-0", null, Vector3.zero, true);
                     }
