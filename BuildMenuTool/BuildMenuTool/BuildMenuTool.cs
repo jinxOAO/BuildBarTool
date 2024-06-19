@@ -64,6 +64,11 @@ namespace BuildMenuTool
 
         public static Color normalColor = new Color(0.588f, 0.588f, 0.588f, 0.7f);
         public static Color disabledColor = new Color(0.2f, 0.15f, 0.15f, 0.7f);
+        public static Color disabledColor2 = new Color(0.316f, 0.281f, 0.281f, 0.7f);
+
+        // 在设置 locked 的建筑的icon颜色时，正常会调用UIBuildMenu的_OnUpdate(的postpatch)设置为此mod中的disableColor（记为颜色A）后，立即由该icon的父级gameobj的UIButton的LateUpdate，修改该UIButton.transition[1].target（也就是这个icon的Image(Graphic)）的color，根据Transition的damp(0.3)设置颜色为原颜色A和transition的normalColor按照damp的过渡色，这个是实际显示的颜色。但是，按住ctrl（准备rebind的绑定按键，在此mod里会导致所有框全部强制显示）切换category时，发现LateUpdate不会每帧执行，奇怪。因此颜色不会从A改变为过渡色，出现了不一致。不按住Ctrl切换category却不会阻止LateUpdate。
+        // 找到了直接原因：上述UIButton的updating在这种情况下是false，但是导致它是false的原因未知。原本游戏中第一行按键的updating属性是true的原因很可能是UIBuildMenu.UpdateUXPanel修改的(它被_OnUpdate调用)。但是奇怪的是为什么我不按Ctrl的时候，第二行UIButton的updating会被设置为true？谁设置的？推测是UIButton.OnEnabled()
+        // 尽管没有找到上述最后那个疑问的答案，但是貌似找到了解决此问题的办法。此外，RebindBuildBar原本的mod也会出现此bug，但仅仅会在开始游戏（不确定是开始游戏还是载入存档的）第一次打开建造栏时出现，后续无论怎么切换都不会出现问题。
 
         public static string lockedText = "";
 
@@ -102,7 +107,7 @@ namespace BuildMenuTool
                     protoIds[i, j] = 0;
                 }
             }
-            lockedText = "locked".Translate();
+            lockedText = "Locked".Translate();
             if (lockedText.Length < 10)
             {
                 int len = (10 - lockedText.Length) / 2;
@@ -363,6 +368,12 @@ namespace BuildMenuTool
             }
         }
 
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(UIButton), "OnEnable")]
+        //public static void testenable(ref UIButton __instance)
+        //{
+        //    logger.LogInfo($"{__instance.gameObject.name} onenable");
+        //}
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(UIBuildMenu), "SetCurrentCategory")]
@@ -397,6 +408,7 @@ namespace BuildMenuTool
                                         num2 += _this.player.inhandItemCount;
                                     }
                                     childIcons[i].enabled = true;
+                                    childButtons[i].OnEnable(); // 执行以将UIButton.updating设置为true来防止颜色不一致问题
                                     childIcons[i].color = normalColor;
                                     childIcons[i].sprite = protos[category, i].iconSprite;
                                     StringBuilderUtility.WriteKMG(_this.strb, 5, (long)num2, false);

@@ -5,3 +5,7 @@ G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.csproj.CoreCo
 G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.dll
 G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.pdb
 G:\work\CSFile\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.csproj.CopyComplete
+F:\GitHubRepository\BuildMenuTool\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.csproj.AssemblyReference.cache
+F:\GitHubRepository\BuildMenuTool\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.csproj.CoreCompileInputs.cache
+F:\GitHubRepository\BuildMenuTool\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.dll
+F:\GitHubRepository\BuildMenuTool\BuildMenuTool\BuildMenuTool\obj\Debug\BuildMenuTool.pdb
