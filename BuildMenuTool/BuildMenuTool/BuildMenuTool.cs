@@ -222,8 +222,53 @@ namespace BuildMenuTool
                     }
                 }
             }
+            LoadFromBuildIndex();
             lockedText = "gmLockedItemText".Translate();
         }
+
+        /// <summary>
+        /// When uiBuildMenu StaticLoad, load the buildindex data from itemProto.BuildIndex
+        /// </summary>
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(UIBuildMenu), "StaticLoad")]
+
+        public static bool StaticLoadPrefix()
+        {
+            if (!UIBuildMenu.staticLoaded)
+            { 
+                LoadFromBuildIndex();
+            }
+            return true;
+        }
+
+
+        public static void LoadFromBuildIndex()
+        {
+            for (int i = 0; i < LDB.items.dataArray.Length; i++)
+            {
+                int buildIndex = LDB.items.dataArray[i].BuildIndex;
+                if (buildIndex > 0)
+                {
+                    int num = buildIndex / 100;
+                    int num2 = buildIndex % 100 - 20; // c21-c30, c = category
+                    if (num <= 15 && num2 >= 0 && num2 <= 12)
+                    {
+                        protoIds[num, num2] = LDB.items.dataArray[i].ID;
+                        protos[num, num2] = LDB.items.dataArray[i];
+
+                        logger.LogInfo(string.Format("Set build bar at {0},{1} (tier 2) from ItemProto.BuildIndex, ID:{2} name:{3}", new object[]
+                        {
+                            num,
+                            num2,
+                            LDB.items.dataArray[i].ID,
+                            LDB.items.dataArray[i].Name.Translate()
+                        }));
+                    }
+                }
+            }
+        }
+
+
 
 
         /// <summary>

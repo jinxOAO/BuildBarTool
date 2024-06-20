@@ -104,13 +104,17 @@ namespace BuildMenuTool
                         {
                             BuildMenuTool.protos[i, j] = LDB.items.Select(result.Value);
                         }
+                        else if (result.Value < 0) // if unused, occupy
+                        {
+                            result.Value = proto.ID;
+                        }
                     }
                     else
                     {
                         ConfigEntry<int> result = BuildMenuTool.customBarBind.Bind("BuildBarBinds",
                             buildIndex.ToString(),
-                            0,
-                            "Unused");
+                            -1,
+                            "Unused"); // unused items will set to -1 to wait for new mods adding new items to the slot
 
                         if (result.Value > 0 && LDB.items.Exist(result.Value))
                         {
@@ -185,7 +189,7 @@ namespace BuildMenuTool
         /// <summary>
         /// use protos[] to set config file
         /// </summary>
-        public static void SetConfigFile()
+        public static void SetConfigFile() // Used by Reset Method
         {
             for (int i = 0; i < BuildMenuTool.extendedCategories.Length; i++)
             {
@@ -193,6 +197,8 @@ namespace BuildMenuTool
             }
             for (int i = 0; i < 16; i++)
             {
+                if (i != RebindBuildBar.Patches.buildMenu.currentCategory && !CustomKeyBindSystem.GetKeyBind("ReassignBuildBar").keyValue) // if not reseting all category, not current category either, then skip
+                    continue;
                 for (int j = 1; j < 13; j++)
                 {
                     int buildIndex = i * 100 + j;
@@ -210,9 +216,9 @@ namespace BuildMenuTool
                     {
                         ConfigEntry<int> result = BuildMenuTool.customBarBind.Bind("BuildBarBinds",
                                buildIndex.ToString(),
-                               0,
+                               -1,
                                "Unused");
-                        result.Value = 0;
+                        result.Value = -1;
                     }
                 }
             }

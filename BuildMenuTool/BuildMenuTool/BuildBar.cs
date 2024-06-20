@@ -76,5 +76,6 @@ namespace BuildMenuTool
             Bind(proto.BuildIndex/100, proto.BuildIndex % 100, proto.ID, 2);
             proto.BuildIndex = 0;
         }
+
     }
 }
