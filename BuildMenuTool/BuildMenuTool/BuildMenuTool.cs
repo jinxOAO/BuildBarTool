@@ -223,6 +223,7 @@ namespace BuildMenuTool
                 }
             }
             LoadFromBuildIndex();
+            protos[2, 7] = LDB.items.Select(2201);
             lockedText = "gmLockedItemText".Translate();
         }
 
@@ -255,7 +256,7 @@ namespace BuildMenuTool
                     {
                         protoIds[num, num2] = LDB.items.dataArray[i].ID;
                         protos[num, num2] = LDB.items.dataArray[i];
-
+                        extendedCategories[num] = true;
                         logger.LogInfo(string.Format("Set build bar at {0},{1} (tier 2) from ItemProto.BuildIndex, ID:{2} name:{3}", new object[]
                         {
                             num,
@@ -629,8 +630,8 @@ namespace BuildMenuTool
                     if (protos[category, num2] != null)
                     {
                         int id2 = protos[category, num2].ID;
-                        bool unlocked = history.ItemUnlocked(id2);
-                        if (unlocked || _this.showButtonsAnyways || forceShowAllButtons)
+                        bool unlocked = history.ItemUnlocked(id2) || _this.showButtonsAnyways;
+                        if (unlocked || (RebindBuildBarCompatibility && forceShowAllButtons))
                         {
                             childIcons[num2].enabled = true;
                             childIcons[num2].color = normalColor;
@@ -673,7 +674,8 @@ namespace BuildMenuTool
                             childButtons[num2].tips.itemCount = 0;
                             childButtons[num2].tips.type = UIButton.ItemTipType.Other;
                             childButtons[num2].button.interactable = false;
-                            childButtons[num2].button.gameObject.SetActive(false);
+                            childButtonObjs[num2].SetActive(false);
+                            //childButtons[num2].button.gameObject.SetActive(false);
                         }
                     }
                     else if (forceShowAllButtons)
