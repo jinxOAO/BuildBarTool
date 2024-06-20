@@ -223,7 +223,6 @@ namespace BuildMenuTool
                 }
             }
             LoadFromBuildIndex();
-            protos[2, 7] = LDB.items.Select(2201);
             lockedText = "gmLockedItemText".Translate();
         }
 
