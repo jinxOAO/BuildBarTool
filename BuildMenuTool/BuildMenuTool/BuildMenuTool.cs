@@ -22,7 +22,7 @@ namespace BuildMenuTool
     [BepInDependency(CommonAPIPlugin.GUID)]
     [CommonAPISubmoduleDependency(nameof(ProtoRegistry), nameof(TabSystem), nameof(LocalizationModule))]
     [BepInPlugin(GUID, NAME, VERSION)]
-    public class BuildMenuTool : BaseUnityPlugin
+    public class BuildMenuToolPlugin : BaseUnityPlugin
     {
         public const string GUID = "Gnimaerd.DSP.plugin.BuildMenuTool";
         public const string NAME = "BuildMenuTool";
@@ -77,7 +77,7 @@ namespace BuildMenuTool
             BMTProtos.AddLocalizationProtos();
             logger = base.Logger;
             InitStaticData();
-            Harmony.CreateAndPatchAll(typeof(BuildMenuTool));
+            Harmony.CreateAndPatchAll(typeof(BuildMenuToolPlugin));
         }
 
         public void Start()
@@ -195,7 +195,7 @@ namespace BuildMenuTool
         [HarmonyPatch(typeof(VFPreload_Patch), "VFPreloadPostPatch")]
         public static void PostLoadData()
         {
-
+            // load from data by BuildBar.Bind()
             for (int i = 0; i < 16; i++)
             {
                 for (int j = 0; j < 13; j++)
@@ -222,16 +222,19 @@ namespace BuildMenuTool
                     }
                 }
             }
+
+            // load from data in itemProto.BuildIndex
             LoadFromBuildIndex();
+
+            // init text translate
             lockedText = "gmLockedItemText".Translate();
         }
 
         /// <summary>
-        /// When uiBuildMenu StaticLoad, load the buildindex data from itemProto.BuildIndex
+        /// When UIBuildMenu StaticLoad, load the buildindex data from itemProto.BuildIndex
         /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(UIBuildMenu), "StaticLoad")]
-
         public static bool StaticLoadPrefix()
         {
             if (!UIBuildMenu.staticLoaded)
@@ -450,6 +453,7 @@ namespace BuildMenuTool
                                     childIcons[i].enabled = true;
                                     childButtons[i].OnEnable(); // 执行以将UIButton.updating设置为true来防止颜色不一致问题
                                     childIcons[i].color = normalColor;
+                                    childButtons[i].transitions[1].normalColor = normalColor;
                                     childIcons[i].sprite = protos[category, i].iconSprite;
                                     StringBuilderUtility.WriteKMG(_this.strb, 5, (long)num2, false);
                                     childNumTexts[i].text = ((num2 > 0) ? _this.strb.ToString().Trim() : "");
@@ -460,7 +464,8 @@ namespace BuildMenuTool
                                     {
                                         childNumTexts[i].text = lockedText;
                                         childNumTexts[i].color = lockedTextColor;
-                                        childIcons[i].color = disabledColor;
+                                        childIcons[i].color = disabledColor2;
+                                        childButtons[i].transitions[1].normalColor = disabledColor2;
                                     }
                                     childButtonObjs[i].SetActive(true);
 
@@ -495,78 +500,6 @@ namespace BuildMenuTool
                         childNumTexts[i].text = "";
                     }
                 }
-            }
-        }
-
-
-        public static void OnChildButtonClick(int index)
-        {
-            UIBuildMenu _this = UIRoot.instance.uiGame.buildMenu;
-            int category = _this.currentCategory;
-            if(category < 0 || category > protos.Length)
-            {
-                return;
-            }
-            bool flag = false;
-            if (_this.player == null)
-            {
-                return;
-            }
-            if (protos[category, index] == null)
-            {
-                return;
-            }
-            int id = protos[category, index].ID;
-            if (!_this.showButtonsAnyways && !GameMain.history.ItemUnlocked(id))
-            {
-                return;
-            }
-            if (index == dblClickIndex && GameMain.gameTime - dblClickTime < 0.33000001311302185)
-            {
-                UIRoot.instance.uiGame.FocusOnReplicate(id);
-                dblClickTime = 0.0;
-                dblClickIndex = 0;
-                flag = true;
-            }
-            dblClickIndex = index;
-            dblClickTime = GameMain.gameTime;
-            for (int i = 0; i < _this.randRemindTips.Length; i++)
-            {
-                if (_this.randRemindTips[i] != null && _this.randRemindTips[i].active)
-                {
-                    int featureId = _this.randRemindTips[i].featureId;
-                    int num = featureId / 100;
-                    int num2 = featureId % 100;
-                    if (category == num && index == num2)
-                    {
-                        _this.randRemindTips[i]._Close();
-                    }
-                }
-            }
-            if (_this.player.package.GetItemCount(id) <= 0 && (category != 9 || index != 1))
-            {
-                if (!flag)
-                {
-                    UIRealtimeTip.Popup("双击打开合成器".Translate(), true, 2);
-                }
-                return;
-            }
-            if (_this.player.inhandItemId == id)
-            {
-                _this.player.SetHandItems(0, 0, 0);
-            }
-            else if (_this.player.package.GetItemCount(id) > 0 || (category == 9 && index == 1))
-            {
-                _this.player.SetHandItems(id, 0, 0);
-            }
-            else
-            {
-                _this.player.SetHandItems(0, 0, 0);
-            }
-            if (_this.isKeyDownCallingAudio)
-            {
-                VFAudio.Create("build-menu-child", null, Vector3.zero, false, 0, -1, -1L).Play();
-                _this.isKeyDownCallingAudio = false;
             }
         }
 
@@ -634,6 +567,7 @@ namespace BuildMenuTool
                         {
                             childIcons[num2].enabled = true;
                             childIcons[num2].color = normalColor;
+                            childButtons[num2].transitions[1].normalColor = normalColor;
                             childButtons[num2].OnEnable(); // 执行以将UIButton.updating设置为true来防止颜色不一致问题
                             childButtons[num2].tips.itemId = id2;
                             childButtons[num2].tips.itemInc = 0;
@@ -662,7 +596,8 @@ namespace BuildMenuTool
                             {
                                 childNumTexts[num2].text = lockedText;
                                 childNumTexts[num2].color = lockedTextColor;
-                                childIcons[num2].color = disabledColor;
+                                childIcons[num2].color = disabledColor2;
+                                childButtons[num2].transitions[1].normalColor = disabledColor2; // 防止闪烁情况发生，阻止颜色折中效果，将两端颜色设为一致，防止帧前后（因为UIButton的Update导致）颜色跳变
                             }
                             childButtons[num2].button.gameObject.SetActive(true);
                         }
@@ -701,6 +636,79 @@ namespace BuildMenuTool
                 RefreshHotKeyRow(true);
             }
         }
+
+
+        public static void OnChildButtonClick(int index)
+        {
+            UIBuildMenu _this = UIRoot.instance.uiGame.buildMenu;
+            int category = _this.currentCategory;
+            if (category < 0 || category > protos.Length)
+            {
+                return;
+            }
+            bool flag = false;
+            if (_this.player == null)
+            {
+                return;
+            }
+            if (protos[category, index] == null)
+            {
+                return;
+            }
+            int id = protos[category, index].ID;
+            if (!_this.showButtonsAnyways && !GameMain.history.ItemUnlocked(id))
+            {
+                return;
+            }
+            if (index == dblClickIndex && GameMain.gameTime - dblClickTime < 0.33000001311302185)
+            {
+                UIRoot.instance.uiGame.FocusOnReplicate(id);
+                dblClickTime = 0.0;
+                dblClickIndex = 0;
+                flag = true;
+            }
+            dblClickIndex = index;
+            dblClickTime = GameMain.gameTime;
+            for (int i = 0; i < _this.randRemindTips.Length; i++)
+            {
+                if (_this.randRemindTips[i] != null && _this.randRemindTips[i].active)
+                {
+                    int featureId = _this.randRemindTips[i].featureId;
+                    int num = featureId / 100;
+                    int num2 = featureId % 100;
+                    if (category == num && index == num2)
+                    {
+                        _this.randRemindTips[i]._Close();
+                    }
+                }
+            }
+            if (_this.player.package.GetItemCount(id) <= 0 && (category != 9 || index != 1))
+            {
+                if (!flag)
+                {
+                    UIRealtimeTip.Popup("双击打开合成器".Translate(), true, 2);
+                }
+                return;
+            }
+            if (_this.player.inhandItemId == id)
+            {
+                _this.player.SetHandItems(0, 0, 0);
+            }
+            else if (_this.player.package.GetItemCount(id) > 0 || (category == 9 && index == 1))
+            {
+                _this.player.SetHandItems(id, 0, 0);
+            }
+            else
+            {
+                _this.player.SetHandItems(0, 0, 0);
+            }
+            if (_this.isKeyDownCallingAudio)
+            {
+                VFAudio.Create("build-menu-child", null, Vector3.zero, false, 0, -1, -1L).Play();
+                _this.isKeyDownCallingAudio = false;
+            }
+        }
+
 
         public static void RefreshHotKeyRow(bool force0 = false)
         {

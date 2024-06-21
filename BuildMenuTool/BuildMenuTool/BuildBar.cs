@@ -1,81 +1,97 @@
-﻿using BepInEx.Logging;
-using CommonAPI;
-using HarmonyLib.Tools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using xiaoye97;
+﻿using xiaoye97;
 
 namespace BuildMenuTool
 {
     public static class BuildBar
     {
-        public static bool Bind(int category, int index, int itemId, int tier = 2)
+        /// <summary>
+        /// Bind an item to a button on the build bar. 将一个物品绑定到建造栏的按钮上。
+        /// </summary>
+        /// <param name="itemId">Id of the item you want to bind. 要绑定的物品Id。</param>
+        /// <param name="category">Category that the button belongs to (1-10). 按钮所在的建造栏的类别序号（1-10）。</param>
+        /// <param name="index">Button position from left to right (1-10). 按钮位置序号（从左向右1-10）。</param>
+        /// <param name="isTopRow">Bind the item to the buttons in top row (true) or bottom row (false). 将建筑绑定在上面一行(truw)还是下面一行(false)的按钮上。</param>
+        /// <returns></returns>
+        public static bool Bind(int itemId, int category, int index, bool isTopRow = true)
         {
             if(category >= 1 && category < 12)
             {
                 if (index >= 1 && index <= 10)
                 {
-                    if (tier == 1)
+                    if (!isTopRow)
                     {
                         LDBTool.SetBuildBar(category, index, itemId);
                     }
-                    else if (tier == 2)
+                    else if (isTopRow)
                     {
-                        if (BuildMenuTool.protoIds[category, index] > 0)
+                        if (BuildMenuToolPlugin.protoIds[category, index] > 0)
                         {
-                            BuildMenuTool.logger.LogWarning(string.Format("Bind Build Bar Fail (item ID:{0}). Build bar [{1}, tier2, {2}] is already bound with another item ID:{3}.", new object[]
+                            BuildMenuToolPlugin.logger.LogWarning(string.Format("Bind Build Bar Fail (item ID:{0}). Build bar [{1}, tier2, {2}] is already bound with another item ID:{3}.", new object[]
                             {
                                 itemId,
                                 category,
                                 index,
-                                BuildMenuTool.protoIds[category, index]
+                                BuildMenuToolPlugin.protoIds[category, index]
                             }));
                             return false;
                         }
                         else
-                            BuildMenuTool.protoIds[category, index] = itemId;
+                            BuildMenuToolPlugin.protoIds[category, index] = itemId;
                     }
                     else
                     {
-                        BuildMenuTool.logger.LogWarning("Bind Build Bar Fail. tier must be 1 or 2.");
+                        BuildMenuToolPlugin.logger.LogWarning("Bind Build Bar Fail. tier must be 1 or 2.");
                         return false;
                     }
                 }
                 else
                 {
-                    BuildMenuTool.logger.LogWarning("Bind Build Bar Fail. index must be between 1 and 10.");
+                    BuildMenuToolPlugin.logger.LogWarning("Bind Build Bar Fail. index must be between 1 and 10.");
                     return false;
                 }
             }
             else
             {
-                BuildMenuTool.logger.LogWarning("Bind Build Bar Fail. category must be between 1 and 12.");
+                BuildMenuToolPlugin.logger.LogWarning("Bind Build Bar Fail. category must be between 1 and 12.");
                 return false;
             }
             return true;
         }
 
-        public static void BindBuildBar(this ItemProto proto, int buildIndex, int tier)
+        /// <summary>
+        /// Bind an item to a button on the build bar. 将一个物品绑定到建造栏的按钮上。
+        /// </summary>
+        /// <param name="proto"></param>
+        /// <param name="buildIndex">BuildIndex = category * 100 + index</param>
+        /// <param name="isTopRow">Bind the item to the buttons in top row (true) or bottom row (false). 将建筑绑定在上面一行(truw)还是下面一行(false)的按钮上。</param>
+        public static void BindBuildBar(this ItemProto proto, int buildIndex, bool isTopRow)
         {
-            Bind(buildIndex / 100, buildIndex % 100, proto.ID ,tier);
+            Bind(proto.ID, buildIndex / 100, buildIndex % 100, isTopRow);
             proto.BuildIndex = 0;
         }
 
-        public static void BindBuildBar(this ItemProto proto, int category, int index, int tier)
+        /// <summary>
+        /// Bind an item to a button on the build bar. 将一个物品绑定到建造栏的按钮上。
+        /// </summary>
+        /// <param name="proto"></param>
+        /// <param name="category">Category that the button belongs to (from left to right: 1-10). 按钮所在的建造栏的类别序号（1-10）。</param>
+        /// <param name="index">Button position (from left to right: 1-10). 按钮位置序号（从左向右1-10）。</param>
+        /// <param name="isTopRow">Bind the item to the buttons in top row (true) or bottom row (false). 将建筑绑定在上面一行(truw)还是下面一行(false)的按钮上。</param>
+        public static void BindBuildBar(this ItemProto proto, int category, int index, bool isTopRow)
         {
-            Bind(category, index, proto.ID, tier);
+            Bind(proto.ID, category, index, isTopRow);
             proto.BuildIndex = 0;
         }
 
-        public static void SetToTier2BuildBar(this ItemProto proto)
-        {
-            Bind(proto.BuildIndex/100, proto.BuildIndex % 100, proto.ID, 2);
-            proto.BuildIndex = 0;
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="proto"></param>
+        //public static void SetToTier2BuildBar(this ItemProto proto)
+        //{
+        //    Bind(proto.BuildIndex/100, proto.BuildIndex % 100, proto.ID, 2);
+        //    proto.BuildIndex = 0;
+        //}
 
     }
 }
