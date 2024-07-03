@@ -26,7 +26,7 @@ namespace BuildMenuTool
     {
         public const string GUID = "Gnimaerd.DSP.plugin.BuildMenuTool";
         public const string NAME = "BuildMenuTool";
-        public const string VERSION = "0.1.0";
+        public const string VERSION = "1.0.0";
         internal static bool developerMode = true;
 
         public static ConfigFile customBarBind = new ConfigFile($"{Paths.ConfigPath}/RebindBuildBar/CustomBarBindTier2.cfg", true);
