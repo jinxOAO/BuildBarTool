@@ -1,4 +1,4 @@
-# BuildMenuTool / 建造栏工具
+# BuildBarTool / 建造栏工具
 
 This mod add a new row to the build menu. MOD developers can bind their new items to the buttons in this new row. 
 
@@ -8,19 +8,20 @@ This mod add a new row to the build menu. MOD developers can bind their new item
 
 # Examples -- For MOD Developers / 使用示例 -- 给MOD开发者
 ```
-using BuildMenuTool;
+using BuildBarTool;
 
 [BepInPlugin(GUID, NAME, VERSION)] // your mod info 你的mod信息
-[BepInDependency(BuildMenuToolPlugin.GUID)] // add this mod as hard dependency 将此mod作为你mod的依赖
+[BepInDependency(BuildBarToolPlugin.GUID)] // add this mod as hard dependency 将此mod作为你mod的依赖
 public class YourPlugin : BaseUnityPlugin
 {   
     void Start()
     {
         // ********* Anything you do to register new items. 
 		
-        BuildBar.Bind(9554, 3, 4); 
+        BuildBarTool.SetBuildBar(3, 4, 9554, true); 
         // for example, item 9554 will be bound to the button in the red circle (index 4 of top row) in category 3. 
-        // 把物品9554绑定到红圈所示的按钮上。
+        // "true" means the item will be bound to the top row (red square).
+        // 把物品9554绑定到红圈所示的按钮上。 true 代表着绑定在第二行上（红框所示）
     }
 	
     public static void MethodThatYouRegisterYourItems()
@@ -28,17 +29,17 @@ public class YourPlugin : BaseUnityPlugin
         // ItemProto yourItem;
         // ******** Anything you do to register your items by CommonAPI or LDBTool.
 		
-        yourItem.BindBuildBar(3, 4, true); 
+        yourItem.SetBuildBar(3, 4, true); 
         // This is another way you can bind your item to the build bar. 你也可以使用这另一种方法。
-        // But NEVER USE LDB.items.Select(id) to bind. 绝不要使用LDB.items.Select(id)来绑定。
+        // DONNOT USE LDB.items.Select(id) to select an ItemProto to bind build bar. 绝不要使用LDB.items.Select(id)来获取ItemProto进行绑定。
     }
 }
 
 ```
 
-You can simply set your itemProto's buildIndex = category × 100 + index + **20**, without adding this mod to your mod's hard dependency or `using BuildMenuTool;`. In this case, only the players who has installed BuildMenuTool will automatically bind that item to the buttons in the top row. Those who doesn't install the BuildMenuTool can still play your mod.
+You can simply set your itemProto's buildIndex = category × 100 + index + **20**, without adding this mod to your mod's hard dependency or `using BuildBarTool;`. In this case, only the players who has installed BuildBarTool will automatically bind that item to the buttons in the top row. Those who doesn't install the BuildBarTool can still play your mod.
 
-你也可以直接把itemProto的buildIndex设置成category × 100 + index + **20**，而不需要`using BuildMenuTool;`，也不需要把此mod作为前置mod。若如此做，任何安装了此mod的玩家可以自动将该物品绑定到对应的第二行建造菜单上，未安装此mod的玩家也可以正常使用你的mod。  
+你也可以直接把itemProto的buildIndex设置成category × 100 + index + **20**，而不需要`using BuildBarTool;`，也不需要把此mod作为前置mod。若如此做，任何安装了此mod的玩家可以自动将该物品绑定到对应的第二行建造菜单上，未安装此mod的玩家也可以正常使用你的mod。  
 ```
 yourItem.buildIndex = 324; 
 // This is another way you can bind your item to the button in the red circle (index 4 of top row) in category 3.
