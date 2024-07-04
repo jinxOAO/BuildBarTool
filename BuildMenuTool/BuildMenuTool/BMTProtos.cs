@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using CommonAPI.Systems.ModLocalization;
 
-namespace BuildMenuTool
+namespace BuildBarTool
 {
-    internal class BMTProtos
+    internal class BBTProtos
     {
         public static void AddLocalizationProtos()
         {

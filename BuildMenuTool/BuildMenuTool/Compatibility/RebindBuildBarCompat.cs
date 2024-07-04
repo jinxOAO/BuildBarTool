@@ -16,15 +16,15 @@ using UnityEngine;
 using System.Security.Permissions;
 using System.Reflection;
 
-namespace BuildMenuTool
+namespace BuildBarTool
 {
     [BepInDependency(RebindBuildBarPlugin.MODGUID)]
-    [BepInDependency(BuildMenuToolPlugin.GUID)]
+    [BepInDependency(BuildBarToolPlugin.GUID)]
     [BepInPlugin(GUID, NAME, VERSION)]
     internal class RebindBuildBarCompat : BaseUnityPlugin
     {
-        public const string GUID = "Gnimaerd.DSP.plugin.BuildMenuTool_RebindBuildBarCompat";
-        public const string NAME = "BuildMenuTool_RebindBuildBarCompat";
+        public const string GUID = "Gnimaerd.DSP.plugin.BuildBarTool_RebindBuildBarCompat";
+        public const string NAME = "BuildBarTool_RebindBuildBarCompat";
         public const string VERSION = "0.1.0";
 
 
@@ -36,7 +36,7 @@ namespace BuildMenuTool
         {
             logger = base.Logger;
             Harmony.CreateAndPatchAll(typeof(RebindBuildBarCompat));
-            BuildMenuToolPlugin.RebindBuildBarCompatibility = true;
+            BuildBarToolPlugin.RebindBuildBarCompatibility = true;
         }
 
         public void Start()
@@ -51,27 +51,27 @@ namespace BuildMenuTool
 
             // when holding clear key or reassign key, show all
             if (CustomKeyBindSystem.GetKeyBind("ReassignBuildBar").keyValue)
-                BuildMenuToolPlugin.forceShowAllButtons = true;
+                BuildBarToolPlugin.forceShowAllButtons = true;
             else
-                BuildMenuToolPlugin.forceShowAllButtons = false;
+                BuildBarToolPlugin.forceShowAllButtons = false;
 
 
             if (CustomKeyBindSystem.GetKeyBind("ClearBuildBar").keyValue)
             {
                 for (int i = 1; i <= 10; i++)
                 {
-                    if (!BuildMenuToolPlugin.childButtons[i].isPointerEnter) continue;
+                    if (!BuildBarToolPlugin.childButtons[i].isPointerEnter) continue;
                     int buildIndex = buildMenu.currentCategory * 100 + i;
 
-                    ConfigEntry<int> result = BuildMenuToolPlugin.customBarBind.Bind("BuildBarBinds",
+                    ConfigEntry<int> result = BuildBarToolPlugin.customBarBind.Bind("BuildBarBinds",
                         buildIndex.ToString(),
                         0,
                         "Cleared by player");
                     result.Value = 0;
-                    BuildMenuToolPlugin.protos[buildMenu.currentCategory, i] = null;
+                    BuildBarToolPlugin.protos[buildMenu.currentCategory, i] = null;
                     buildMenu.SetCurrentCategory(buildMenu.currentCategory);
                     VFAudio.Create("ui-click-0", null, Vector3.zero, true);
-                    BuildMenuToolPlugin.RefreshCategoryIfExtended(buildMenu.currentCategory);
+                    BuildBarToolPlugin.RefreshCategoryIfExtended(buildMenu.currentCategory);
                     return;
                 }
             }
@@ -79,7 +79,7 @@ namespace BuildMenuTool
 
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(BuildMenuToolPlugin), "PostLoadData")]
+        [HarmonyPatch(typeof(BuildBarToolPlugin), "PostLoadData")]
         public static void LoadConfigFile()
         {
             for (int i = 0; i < 16; i++)
@@ -87,22 +87,22 @@ namespace BuildMenuTool
                 for (int j = 1; j < 11; j++)
                 {
                     int buildIndex = i * 100 + j;
-                    ItemProto proto = BuildMenuToolPlugin.protos[i, j];
+                    ItemProto proto = BuildBarToolPlugin.protos[i, j];
 
                     if (proto != null && proto.ID != 0)
                     {
-                        ConfigEntry<int> result = BuildMenuToolPlugin.customBarBind.Bind("BuildBarBinds",
+                        ConfigEntry<int> result = BuildBarToolPlugin.customBarBind.Bind("BuildBarBinds",
                             buildIndex.ToString(),
                             proto.ID,
                             $"Item: {proto.Name.Translate()}");
 
                         if (result.Value == 0)
                         {
-                            BuildMenuToolPlugin.protos[i, j] = null;
+                            BuildBarToolPlugin.protos[i, j] = null;
                         }
                         else if (result.Value > 0 && LDB.items.Exist(result.Value) && result.Value != proto.ID)
                         {
-                            BuildMenuToolPlugin.protos[i, j] = LDB.items.Select(result.Value);
+                            BuildBarToolPlugin.protos[i, j] = LDB.items.Select(result.Value);
                         }
                         else if (result.Value < 0) // if unused, occupy
                         {
@@ -111,15 +111,15 @@ namespace BuildMenuTool
                     }
                     else
                     {
-                        ConfigEntry<int> result = BuildMenuToolPlugin.customBarBind.Bind("BuildBarBinds",
+                        ConfigEntry<int> result = BuildBarToolPlugin.customBarBind.Bind("BuildBarBinds",
                             buildIndex.ToString(),
                             -1,
                             "Unused"); // unused items will set to -1 to wait for new mods adding new items to the slot
 
                         if (result.Value > 0 && LDB.items.Exist(result.Value))
                         {
-                            BuildMenuToolPlugin.protos[i, j] = LDB.items.Select(result.Value);
-                            BuildMenuToolPlugin.extendedCategories[i] = true;
+                            BuildBarToolPlugin.protos[i, j] = LDB.items.Select(result.Value);
+                            BuildBarToolPlugin.extendedCategories[i] = true;
                         }
                     }
                 }
@@ -135,25 +135,25 @@ namespace BuildMenuTool
             {
                 for (int i = 1; i < 16; i++)
                 {
-                    BuildMenuToolPlugin.extendedCategories[i] = false;
+                    BuildBarToolPlugin.extendedCategories[i] = false;
                     for (int j = 1; j < 13; j++)
                     {
-                        if (BuildMenuToolPlugin.protoIds[i, j] > 0)
+                        if (BuildBarToolPlugin.protoIds[i, j] > 0)
                         {
-                            ItemProto item = LDB.items.Select(BuildMenuToolPlugin.protoIds[i, j]);
+                            ItemProto item = LDB.items.Select(BuildBarToolPlugin.protoIds[i, j]);
                             if (item != null)
                             {
-                                BuildMenuToolPlugin.protos[i, j] = item;
-                                BuildMenuToolPlugin.extendedCategories[i] = true;
+                                BuildBarToolPlugin.protos[i, j] = item;
+                                BuildBarToolPlugin.extendedCategories[i] = true;
                             }
                             else
                             {
-                                BuildMenuToolPlugin.protos[i, j] = null;
+                                BuildBarToolPlugin.protos[i, j] = null;
                             }
                         }
                         else
                         {
-                            BuildMenuToolPlugin.protos[i, j] = null;
+                            BuildBarToolPlugin.protos[i, j] = null;
                         }
                     }
                 }
@@ -161,30 +161,30 @@ namespace BuildMenuTool
             else
             {
                 int i = RebindBuildBar.Patches.buildMenu.currentCategory;
-                BuildMenuToolPlugin.extendedCategories[i] = false;
+                BuildBarToolPlugin.extendedCategories[i] = false;
                 for (int j = 1; j < 13; j++)
                 {
-                    if (BuildMenuToolPlugin.protoIds[i, j] > 0)
+                    if (BuildBarToolPlugin.protoIds[i, j] > 0)
                     {
-                        ItemProto item = LDB.items.Select(BuildMenuToolPlugin.protoIds[i, j]);
+                        ItemProto item = LDB.items.Select(BuildBarToolPlugin.protoIds[i, j]);
                         if (item != null)
                         {
-                            BuildMenuToolPlugin.protos[i, j] = item;
-                            BuildMenuToolPlugin.extendedCategories[i] = true;
+                            BuildBarToolPlugin.protos[i, j] = item;
+                            BuildBarToolPlugin.extendedCategories[i] = true;
                         }
                         else
                         {
-                            BuildMenuToolPlugin.protos[i, j] = null;
+                            BuildBarToolPlugin.protos[i, j] = null;
                         }
                     }
                     else
                     {
-                        BuildMenuToolPlugin.protos[i, j] = null;
+                        BuildBarToolPlugin.protos[i, j] = null;
                     }
                 }
             }
             SetConfigFile();
-            BuildMenuToolPlugin.customBarBind.Save();
+            BuildBarToolPlugin.customBarBind.Save();
         }
 
         /// <summary>
@@ -192,9 +192,9 @@ namespace BuildMenuTool
         /// </summary>
         public static void SetConfigFile() // Used by Reset Method
         {
-            for (int i = 0; i < BuildMenuToolPlugin.extendedCategories.Length; i++)
+            for (int i = 0; i < BuildBarToolPlugin.extendedCategories.Length; i++)
             {
-                BuildMenuToolPlugin.extendedCategories[i] = false;
+                BuildBarToolPlugin.extendedCategories[i] = false;
             }
             for (int i = 0; i < 16; i++)
             {
@@ -203,19 +203,19 @@ namespace BuildMenuTool
                 for (int j = 1; j < 13; j++)
                 {
                     int buildIndex = i * 100 + j;
-                    if (BuildMenuToolPlugin.protos[i, j] != null)
+                    if (BuildBarToolPlugin.protos[i, j] != null)
                     {
-                        ItemProto item = BuildMenuToolPlugin.protos[i, j];
-                        ConfigEntry<int> result = BuildMenuToolPlugin.customBarBind.Bind("BuildBarBinds",
+                        ItemProto item = BuildBarToolPlugin.protos[i, j];
+                        ConfigEntry<int> result = BuildBarToolPlugin.customBarBind.Bind("BuildBarBinds",
                             buildIndex.ToString(),
                             item.ID,
                             $"Item: {item.Name.Translate()}");
                         result.Value = item.ID;
-                        BuildMenuToolPlugin.extendedCategories[i] = true;
+                        BuildBarToolPlugin.extendedCategories[i] = true;
                     }
                     else
                     {
-                        ConfigEntry<int> result = BuildMenuToolPlugin.customBarBind.Bind("BuildBarBinds",
+                        ConfigEntry<int> result = BuildBarToolPlugin.customBarBind.Bind("BuildBarBinds",
                                buildIndex.ToString(),
                                -1,
                                "Unused");
@@ -236,7 +236,7 @@ namespace BuildMenuTool
             UIBuildMenu buildMenu = RebindBuildBar.Patches.buildMenu;
             if (buildMenu == null || !buildMenu.childGroup.gameObject.activeSelf) return false;
             if (buildMenu.currentCategory < 1 || buildMenu.currentCategory >= 9) return false;
-            if (CustomKeyBindSystem.GetKeyBind("ReassignBuildBar").keyValue && BuildMenuToolPlugin.hotkeyActivateRow == 1) // block by return false
+            if (CustomKeyBindSystem.GetKeyBind("ReassignBuildBar").keyValue && BuildBarToolPlugin.hotkeyActivateRow == 1) // block by return false
             {
                 for (int j = 1; j <= 10; j++)
                 {
@@ -248,13 +248,13 @@ namespace BuildMenuTool
                         {
                             if (proto != null && proto.ID != 0)
                             {
-                                ConfigEntry<int> result = BuildMenuToolPlugin.customBarBind.Bind("BuildBarBinds",
+                                ConfigEntry<int> result = BuildBarToolPlugin.customBarBind.Bind("BuildBarBinds",
                                     buildIndex.ToString(),
                                     proto.ID,
                                     $"Item: {proto.Name.Translate()}");
                                 result.Value = proto.ID;
-                                BuildMenuToolPlugin.protos[buildMenu.currentCategory, j] = proto;
-                                BuildMenuToolPlugin.extendedCategories[buildMenu.currentCategory] = true;
+                                BuildBarToolPlugin.protos[buildMenu.currentCategory, j] = proto;
+                                BuildBarToolPlugin.extendedCategories[buildMenu.currentCategory] = true;
                                 buildMenu.SetCurrentCategory(buildMenu.currentCategory);
                                 VFAudio.Create("ui-click-0", null, Vector3.zero, true);
                             }
@@ -270,7 +270,7 @@ namespace BuildMenuTool
 
         // reset patch
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(BuildMenuToolPlugin), "OnChildButtonClick")]
+        [HarmonyPatch(typeof(BuildBarToolPlugin), "OnChildButtonClick")]
         public static bool OnChildButtonClickPrefix(int index)
         {
             UIBuildMenu buildMenu = RebindBuildBar.Patches.buildMenu;
@@ -286,13 +286,13 @@ namespace BuildMenuTool
                 {
                     if (proto != null && proto.ID != 0)
                     {
-                        ConfigEntry<int> result = BuildMenuToolPlugin.customBarBind.Bind("BuildBarBinds",
+                        ConfigEntry<int> result = BuildBarToolPlugin.customBarBind.Bind("BuildBarBinds",
                             buildIndex.ToString(),
                             proto.ID,
                             $"Item: {proto.Name.Translate()}");
                         result.Value = proto.ID;
-                        BuildMenuToolPlugin.protos[buildMenu.currentCategory, index] = proto;
-                        BuildMenuToolPlugin.extendedCategories[buildMenu.currentCategory] = true;
+                        BuildBarToolPlugin.protos[buildMenu.currentCategory, index] = proto;
+                        BuildBarToolPlugin.extendedCategories[buildMenu.currentCategory] = true;
                         buildMenu.SetCurrentCategory(buildMenu.currentCategory);
                         VFAudio.Create("ui-click-0", null, Vector3.zero, true);
                     }
