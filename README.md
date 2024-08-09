@@ -24,6 +24,7 @@ public class YourPlugin : BaseUnityPlugin
         // 把物品9554绑定到红圈所示的按钮上。 true 代表着绑定在第二行上（红框所示）
     }
 	
+	// Another way to use this MOD is to use ItemProto.SetBuildBar() after you registered your items
     public static void MethodThatYouRegisterYourItems()
     {
         // ItemProto yourItem;
@@ -50,3 +51,12 @@ yourItem.buildIndex = 324;
 
 This mod is compatible with [RebindBuildBar](https://thunderstore.io/c/dyson-sphere-program/p/kremnev8/RebindBuildBar/), and with that mod, players can customize their own build bar, even for the buttons in the top row.  
 此mod与[RebindBuildBar](https://thunderstore.io/c/dyson-sphere-program/p/kremnev8/RebindBuildBar/) 兼容，同时安装这两个mod允许玩家自定义建造菜单（包括第二行）。
+
+## Changelog 更新日志
+- v1.0.1
+	+ Fixed a compat issue with BuildToolOpt (players could not place white holograms when lacking of item)
+	+ 修复了一个和BuildToolOpt的兼容性问题（即使物品不足也可以放置建筑虚影的功能曾无法生效）
+
+- v1.0.0
+    + Initial Release
+	+ 初始版本

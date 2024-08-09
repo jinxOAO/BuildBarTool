@@ -15,18 +15,21 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using BepInEx.Logging;
 using xiaoye97.Patches;
+using System.Reflection.Emit;
+using System.Reflection;
 
 namespace BuildBarTool
 {
     [BepInDependency(LDBToolPlugin.MODGUID)]
     [BepInDependency(CommonAPIPlugin.GUID)]
+    [BepInDependency(BuildToolOptCompat.MODGUID, BepInDependency.DependencyFlags.SoftDependency)]
     [CommonAPISubmoduleDependency(nameof(ProtoRegistry), nameof(TabSystem), nameof(LocalizationModule))]
     [BepInPlugin(GUID, NAME, VERSION)]
     public class BuildBarToolPlugin : BaseUnityPlugin
     {
         public const string GUID = "Gnimaerd.DSP.plugin.BuildBarTool";
         public const string NAME = "BuildBarTool";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.0.1";
         internal static bool developerMode = true;
 
         public static ConfigFile customBarBind = new ConfigFile($"{Paths.ConfigPath}/RebindBuildBar/CustomBarBindTier2.cfg", true);
@@ -154,7 +157,7 @@ namespace BuildBarTool
                 buildBtnObj.AddComponent<Button>(); // 再Add新的
                 //buildBtnObj.GetComponent<Button>().onClick.RemoveAllListeners(); // 这个此处无效，用这个办法会无法移除原本的点击功能，必须用上面先Destory后Add的方法。
                 string ii = i.ToString();
-                buildBtnObj.GetComponent<Button>().onClick.AddListener(() => { OnChildButtonClick(Convert.ToInt32(ii)); }); // 为什么这里直接传入i会导致所有按钮都是i=9的状态，但是转换一下string就行了？！
+                buildBtnObj.GetComponent<Button>().onClick.AddListener(() => { OnChildButtonClick(Convert.ToInt32(ii)); });
 
                 UIButton uiBtn = buildBtnObj.GetComponent<UIButton>();
                 uiBtn.button = buildBtnObj.GetComponent<Button>();
@@ -696,10 +699,13 @@ namespace BuildBarTool
             {
                 itemCount += _this.player.deliveryPackage.GetItemCount(id);
             }
+            if (itemCount <= 0 && BuildToolOptCompat.enabled && BuildToolOptCompat.hologramEnabled)
+                itemCount = 999;
             if (itemCount <= 0 && (category != 9 || index != 1))
             {
                 if (!flag)
                 {
+                    GameMain.data.warningSystem.Broadcast(EBroadcastVocal.InsufficientMaterials, -1, 0, 0);
                     UIRealtimeTip.Popup("双击打开合成器".Translate(), true, 2);
                 }
                 return;

@@ -45,6 +45,11 @@
       <HintPath>D:\SteamLibrary\steamapps\common\Dyson Sphere Program\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="BuildToolOpt, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\dependencies\BuildToolOpt.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="CommonAPI, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\SteamLibrary\steamapps\common\Dyson Sphere Program\BepInEx\plugins\CommonAPI.dll</HintPath>
@@ -93,10 +98,14 @@
     <Compile Include="BMTProtos.cs" />
     <Compile Include="BuildBarTool.cs" />
     <Compile Include="BuildBarToolPlugin.cs" />
+    <Compile Include="Compatibility\BuildToolOptCompat.cs" />
     <Compile Include="Compatibility\CompatCheck.cs" />
     <Compile Include="Compatibility\DeliverySlotsTweaksCompat.cs" />
     <Compile Include="Compatibility\RebindBuildBarCompat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BuildToolOpt.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
