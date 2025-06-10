@@ -325,11 +325,13 @@ namespace BuildBarTool
                     }
                     if (_this.buildMenu.isDismantleMode)
                     {
-                        _this.posWanted = -75f;
+                        _this.posWanted = -135f;
+                        oriPosWanted = -75f;
                     }
                     if (_this.buildMenu.isUpgradeMode)
                     {
-                        _this.posWanted = -75f;
+                        _this.posWanted = -135f;
+                        oriPosWanted = -75f;
                     }
                 }
                 else if (_this.sandboxMenu.active)
