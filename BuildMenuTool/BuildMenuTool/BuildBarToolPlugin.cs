@@ -29,7 +29,7 @@ namespace BuildBarTool
     {
         public const string GUID = "Gnimaerd.DSP.plugin.BuildBarTool";
         public const string NAME = "BuildBarTool";
-        public const string VERSION = "1.0.2";
+        public const string VERSION = "1.0.3";
         internal static bool developerMode = true;
 
         public static ConfigFile customBarBind = new ConfigFile($"{Paths.ConfigPath}/RebindBuildBar/CustomBarBindTier2.cfg", true);
